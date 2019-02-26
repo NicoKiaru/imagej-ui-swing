@@ -287,7 +287,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 		}
 	}
 
-	private final static String PERSONAL_SITES_URL = "http://sites.imagej.net/";
+	private final static String PERSONAL_SITES_URL = AvailableSites.getProtocol() + "sites.imagej.net/";
 
 	private void addPersonalSite() {
 		final PersonalSiteDialog dialog = new PersonalSiteDialog();
