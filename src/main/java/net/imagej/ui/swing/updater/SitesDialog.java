@@ -46,21 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
@@ -70,8 +56,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.imagej.updater.FilesCollection;
+import net.imagej.updater.UpToDate;
 import net.imagej.updater.UpdateSite;
 import net.imagej.updater.UploaderService;
+import net.imagej.updater.util.AvailableSites;
 import net.imagej.updater.util.UpdaterUtil;
 import net.imagej.util.MediaWikiClient;
 import net.miginfocom.swing.MigLayout;
@@ -93,7 +81,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 	protected DataModel tableModel;
 	protected JTable table;
 	protected JScrollPane scrollpane;
-	protected JButton addNewSite, addPersonalSite, remove, close;
+	protected JButton addNewSite, addPersonalSite, remove, close, checkForUpdates;
 
 	public SitesDialog(final UpdaterFrame owner, final FilesCollection files)
 	{
@@ -261,6 +249,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 		addNewSite = SwingTools.button("Add update site", "Add update site", this, buttons);
 		remove = SwingTools.button("Remove", "Remove", this, buttons);
 		remove.setEnabled(false);
+		checkForUpdates = SwingTools.button("Update URLs", "Check activated update sites for new URLs", this, buttons);
 		close = SwingTools.button("Close", "Close", this, buttons);
 		contentPane.add(buttons);
 
@@ -360,12 +349,24 @@ public class SitesDialog extends JDialog implements ActionListener {
 		}
 	}
 
+	private void updateAvailableUpdateSites() {
+		new Thread(() -> {
+			AvailableSites.initializeAndAddSites(files);
+			try {
+				SwingUtilities.invokeAndWait(() -> new ReviewSiteURLsDialog(null, files).setVisible(true));
+			} catch (Exception e) { /* ignore */ }
+			AvailableSites.applySitesURLUpdates(files);
+		}).start();
+
+	}
+
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		final Object source = e.getSource();
 		if (source == addNewSite) addNew();
 		else if (source == addPersonalSite) addPersonalSite();
 		else if (source == remove) delete(table.getSelectedRow());
+		else if (source == checkForUpdates) updateAvailableUpdateSites();
 		else if (source == close) {
 			dispose();
 		}
