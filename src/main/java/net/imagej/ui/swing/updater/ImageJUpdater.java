@@ -45,12 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.imagej.ui.swing.updater.ViewOptions.Option;
+import net.imagej.updater.*;
 import net.imagej.updater.Conflicts.Conflict;
-import net.imagej.updater.FileObject;
-import net.imagej.updater.FilesCollection;
-import net.imagej.updater.Installer;
-import net.imagej.updater.UpdaterUI;
-import net.imagej.updater.UploaderService;
 import net.imagej.updater.util.AvailableSites;
 import net.imagej.updater.util.Progress;
 import net.imagej.updater.util.UpdateCanceledException;
@@ -66,6 +62,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.util.AppUtils;
+
+import javax.swing.*;
 
 /**
  * The Updater. As a command.
@@ -109,7 +107,6 @@ public class ImageJUpdater implements UpdaterUI {
 		final File imagejRoot = imagejDirProperty != null ? new File(imagejDirProperty) :
 			AppUtils.getBaseDirectory("ij.dir", FilesCollection.class, "updater");
 		final FilesCollection files = new FilesCollection(log, imagejRoot);
-		AvailableSites.initializeAndAddSites(files, log);
 
 		UpdaterUserInterface.set(new SwingUserInterface(log, statusService));
 
@@ -142,7 +139,13 @@ public class ImageJUpdater implements UpdaterUI {
 		Progress progress = main.getProgress("Starting up...");
 
 		try {
-			String warnings = files.downloadIndexAndChecksum(progress);
+			files.readLocalSettingsIfPresent();
+			AvailableSites.initializeAndAddSites(files, log);
+			if(ReviewSiteURLsDialog.shouldBeDisplayed(files)) {
+				SwingUtilities.invokeAndWait(() -> new ReviewSiteURLsDialog(main, files).setVisible(true));
+			}
+			AvailableSites.applySitesURLUpdates(files);
+			String warnings = files.reloadCollectionAndChecksum(progress);
 			main.checkWritable();
 			main.addCustomViewOptions();
 			if (!warnings.equals("")) main.warn(warnings);
