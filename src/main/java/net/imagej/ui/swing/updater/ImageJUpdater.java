@@ -141,6 +141,10 @@ public class ImageJUpdater implements UpdaterUI {
 		try {
 			files.readLocalSettingsIfPresent();
 			AvailableSites.initializeAndAddSites(files, log);
+			if(!AvailableSites.isSecureMode()) {
+				main.warn("Your Java might be too old to handle updates via HTTPS. This is a security risk!\n" +
+						"Please download a recent version of this software.\n");
+			}
 			if(ReviewSiteURLsDialog.shouldBeDisplayed(files)) {
 				SwingUtilities.invokeAndWait(() -> new ReviewSiteURLsDialog(main, files).setVisible(true));
 			}

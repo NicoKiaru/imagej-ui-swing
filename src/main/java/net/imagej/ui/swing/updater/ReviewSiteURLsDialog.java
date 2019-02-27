@@ -81,7 +81,7 @@ public class ReviewSiteURLsDialog extends JDialog implements ActionListener {
 
 	private static List<UpdateSite> filterUpdatableSites(FilesCollection files) {
 		List<UpdateSite> sites = new ArrayList<>();
-		for(UpdateSite site : files.getUpdateSites(true)) {
+		for(UpdateSite site : files.getUpdateSites(false)) {
 			if(site.getURLStatus() != null &&
 					(site.getURLStatus().equals(UpdateSite.URLStatus.MODIFIED_UPDATABLE) ||
 							(site.getURLStatus().equals(UpdateSite.URLStatus.UPDATABLE)))) {
