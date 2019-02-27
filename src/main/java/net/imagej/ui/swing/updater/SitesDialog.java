@@ -134,7 +134,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 							final UpdateSite site = getUpdateSite(row);
 							if (value.equals(site.getURL())) return super.stopCellEditing();
 							if (validURL(value)) {
-								site.setURL(value);
+								site.setURL(value, true);
 								boolean wasActive = site.isActive();
 								activateUpdateSite(site);
 								if (!wasActive && site.isActive()) tableModel.rowChanged(row);
@@ -204,7 +204,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 							if (site.getURL().equals(string)) return;
 							boolean active = site.isActive();
 							if (active) deactivateUpdateSite(site);
-							site.setURL(string);
+							site.setURL(string, true);
 							if (active && validURL(string)) activateUpdateSite(site);
 							break;
 						case 3:
@@ -356,6 +356,7 @@ public class SitesDialog extends JDialog implements ActionListener {
 				SwingUtilities.invokeAndWait(() -> new ReviewSiteURLsDialog(null, files).setVisible(true));
 			} catch (Exception e) { /* ignore */ }
 			AvailableSites.applySitesURLUpdates(files);
+			tableModel.rowsChanged(0, tableModel.getRowCount()-1);
 		}).start();
 
 	}
