@@ -128,6 +128,10 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 
 		<!-- NB: Define scijava-ui-swing version until pom-scijava 24.0.0 is released -->
 		<scijava-ui-swing.version>0.12.0</scijava-ui-swing.version>
+
+		<!-- skip reproducible build enforcer during development -->
+		<imagej-updater.version>0.10.0-SNAPSHOT</imagej-updater.version>
+		<enforcer.skip>true</enforcer.skip>
 	</properties>
 
 	<repositories>
@@ -150,7 +154,6 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-updater</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- ImgLib2 dependencies -->
